@@ -371,9 +371,6 @@
 /* .IP "\fBsmtpd_tls_dh1024_param_file (empty)\fR"
 /*	File with DH parameters that the Postfix SMTP server should
 /*	use with non-export EDH ciphers.
-/* .IP "\fBsmtpd_tls_dh512_param_file (empty)\fR"
-/*	File with DH parameters that the Postfix SMTP server should
-/*	use with export-grade EDH ciphers.
 /* .IP "\fBsmtpd_tls_dkey_file ($smtpd_tls_dcert_file)\fR"
 /*	File with the Postfix SMTP server DSA private key in PEM format.
 /* .IP "\fBsmtpd_tls_key_file ($smtpd_tls_cert_file)\fR"
@@ -408,9 +405,9 @@
 /*	The OpenSSL cipherlist for "HIGH" grade ciphers.
 /* .IP "\fBtls_medium_cipherlist (ALL:!EXPORT:!LOW:+RC4:@STRENGTH)\fR"
 /*	The OpenSSL cipherlist for "MEDIUM" or higher grade ciphers.
-/* .IP "\fBtls_low_cipherlist (ALL:!EXPORT:+RC4:@STRENGTH)\fR"
+/* .IP "\fBtls_low_cipherlist (see 'postconf -d' output)\fR"
 /*	The OpenSSL cipherlist for "LOW" or higher grade ciphers.
-/* .IP "\fBtls_export_cipherlist (ALL:+RC4:@STRENGTH)\fR"
+/* .IP "\fBtls_export_cipherlist (see 'postconf -d' output)\fR"
 /*	The OpenSSL cipherlist for "EXPORT" or higher grade ciphers.
 /* .IP "\fBtls_null_cipherlist (eNULL:!aNULL)\fR"
 /*	The OpenSSL cipherlist for "NULL" grade ciphers that provide
@@ -427,7 +424,7 @@
 /* .IP "\fBsmtpd_tls_protocols (empty)\fR"
 /*	List of TLS protocols that the Postfix SMTP server will exclude
 /*	or include with opportunistic TLS encryption.
-/* .IP "\fBsmtpd_tls_ciphers (export)\fR"
+/* .IP "\fBsmtpd_tls_ciphers (see 'postconf -d' output)\fR"
 /*	The minimum TLS cipher grade that the Postfix SMTP server
 /*	will use with opportunistic TLS encryption.
 /* .IP "\fBsmtpd_tls_eccert_file (empty)\fR"
@@ -1307,7 +1304,7 @@ char   *var_smtpd_tls_excl_ciph;
 char   *var_smtpd_tls_mand_excl;
 char   *var_smtpd_tls_dcert_file;
 char   *var_smtpd_tls_dh1024_param_file;
-char   *var_smtpd_tls_dh512_param_file;
+char   *var_smtpd_tls_dh512_param_file;		/* Unused */
 char   *var_smtpd_tls_dkey_file;
 char   *var_smtpd_tls_key_file;
 char   *var_smtpd_tls_loglevel;
@@ -5456,8 +5453,6 @@ static void pre_jail_init(char *unused_name, char **unused_argv)
 				    CApath = var_smtpd_tls_CApath,
 				    dh1024_param_file
 				    = var_smtpd_tls_dh1024_param_file,
-				    dh512_param_file
-				    = var_smtpd_tls_dh512_param_file,
 				    eecdh_grade = var_smtpd_tls_eecdh,
 				    protocols = var_smtpd_enforce_tls ?
 				    var_smtpd_tls_mand_proto :

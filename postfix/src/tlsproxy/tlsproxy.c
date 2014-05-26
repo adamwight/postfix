@@ -85,9 +85,6 @@
 /* .IP "\fBtlsproxy_tls_dh1024_param_file ($smtpd_tls_dh1024_param_file)\fR"
 /*	File with DH parameters that the Postfix \fBtlsproxy\fR(8) server
 /*	should use with non-export EDH ciphers.
-/* .IP "\fBtlsproxy_tls_dh512_param_file ($smtpd_tls_dh512_param_file)\fR"
-/*	File with DH parameters that the Postfix \fBtlsproxy\fR(8) server
-/*	should use with export-grade EDH ciphers.
 /* .IP "\fBtlsproxy_tls_dkey_file ($smtpd_tls_dkey_file)\fR"
 /*	File with the Postfix \fBtlsproxy\fR(8) server DSA private key in PEM
 /*	format.
@@ -259,7 +256,7 @@ char   *var_smtpd_tls_excl_ciph;
 char   *var_smtpd_tls_mand_excl;
 char   *var_smtpd_tls_proto;
 char   *var_smtpd_tls_mand_proto;
-char   *var_smtpd_tls_dh512_param_file;
+char   *var_smtpd_tls_dh512_param_file;		/* Unused */
 char   *var_smtpd_tls_dh1024_param_file;
 char   *var_smtpd_tls_eecdh;
 char   *var_smtpd_tls_fpt_dgst;
@@ -994,8 +991,6 @@ static void pre_jail_init(char *unused_name, char **unused_argv)
 			    CApath = var_tlsp_tls_CApath,
 			    dh1024_param_file
 			    = var_tlsp_tls_dh1024_param_file,
-			    dh512_param_file
-			    = var_tlsp_tls_dh512_param_file,
 			    eecdh_grade = var_tlsp_tls_eecdh,
 			    protocols = var_tlsp_enforce_tls ?
 			    var_tlsp_tls_mand_proto :

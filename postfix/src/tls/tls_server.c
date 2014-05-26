@@ -578,8 +578,6 @@ TLS_APPL_STATE *tls_server_init(const TLS_SERVER_INIT_PROPS *props)
     SSL_CTX_set_tmp_dh_callback(server_ctx, tls_tmp_dh_cb);
     if (*props->dh1024_param_file != 0)
 	tls_set_dh_from_file(props->dh1024_param_file, 1024);
-    if (*props->dh512_param_file != 0)
-	tls_set_dh_from_file(props->dh512_param_file, 512);
 
     /*
      * Enable EECDH if available, errors are not fatal, we just keep going

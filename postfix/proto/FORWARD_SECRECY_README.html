@@ -195,7 +195,9 @@ compiled in, but also supports explicitly-configured overrides.
 "export" ciphers.  To use a non-default prime, generate a 512-bit
 DH parameter file and set smtpd_tls_dh512_param_file to the filename
 (see the <a href="#quick-start">quick-start</a> section for details).
-</p>
+With Postfix &ge; 3.1 export cipher suites are by default disabled,
+and export EDH parameters are never used (even if export ciphers
+are explicitly re-enabled).  </p>
 
 <li> <p> The non-export EDH parameters are used for all other EDH
 cipher suites.  To use a non-default prime, generate a 1024-bit or
@@ -269,11 +271,11 @@ cipher suites that don't implement forward secrecy.  Administrators
 are strongly discouraged from changing the cipher list definitions.
 It is likely safe to set "smtp_tls_ciphers = medium" if you wish
 to disable the obsolete "export" and "low" grade ciphers even with
-opportunistic TLS.  Setting a minimum strength does not change the
-preference
-order.  Note that strengths higher than "medium" exclude Exchange
-2003 and likely other widely used MTAs, thus "high" grade ciphers
-should only be used on a case-by-case basis via the <a
+opportunistic TLS (this is the default starting with Postfix 3.1).
+Setting a minimum strength does not change the preference order.
+Note that strengths higher than "medium" exclude Exchange 2003 and
+likely other widely used MTAs, thus "high" grade ciphers should
+only be used on a case-by-case basis via the <a
 href="TLS_README.html#client_tls_policy">TLS policy</a> table. </p>
 
 <h2><a name="quick-start">Getting started, quick and dirty</a></h2>
@@ -317,10 +319,12 @@ few seconds to a few minutes): </p>
 <pre>
 # cd /etc/postfix
 # umask 022
-# openssl dhparam -out dh512.tmp 512 && mv dh512.tmp dh512.pem
 # openssl dhparam -out dh1024.tmp 1024 && mv dh1024.tmp dh1024.pem
 # openssl dhparam -out dh2048.tmp 2048 && mv dh2048.tmp dh2048.pem
-# chmod 644 dh512.pem dh1024.pem dh2048.pem
+# chmod 644 dh1024.pem dh2048.pem
+# Postfix &le; 3.0
+# openssl dhparam -out dh512.tmp 512 && mv dh512.tmp dh512.pem
+# chmod 644 dh512.pem
 </pre>
 </blockquote>
 
@@ -339,6 +343,7 @@ automate this task). </p>
 <pre>
 /etc/postfix/main.cf:
     smtpd_tls_dh1024_param_file = ${config_directory}/dh2048.pem
+    # Postfix &le; 3.0
     smtpd_tls_dh512_param_file = ${config_directory}/dh512.pem
 </pre>
 </blockquote>
