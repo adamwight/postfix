@@ -3396,6 +3396,11 @@ extern bool var_conc_feedback_debug;
 #define DEF_DEST_RATE_DELAY	"0s"
 extern int var_dest_rate_delay;
 
+#define VAR_RATE_DELAY	"default_rate_delay"
+#define _RATE_DELAY	"_rate_delay"
+#define DEF_RATE_DELAY	"0s"
+extern int var_rate_delay;
+
  /*
   * Stress handling.
   */

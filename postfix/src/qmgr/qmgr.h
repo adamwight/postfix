@@ -204,20 +204,25 @@ struct QMGR_TRANSPORT {
     QMGR_FEEDBACK pos_feedback;		/* positive feedback control */
     QMGR_FEEDBACK neg_feedback;		/* negative feedback control */
     int     fail_cohort_limit;		/* flow shutdown control */
-    int     rate_delay;			/* suspend per delivery */
+    int     rate_delay;			/* throttle */
+    int     dest_rate_delay;		/* suspend per delivery */
 };
 
 #define QMGR_TRANSPORT_STAT_DEAD	(1<<1)
+#define QMGR_TRANSPORT_STAT_SUSPENDED	(1<<2)
 
 typedef void (*QMGR_TRANSPORT_ALLOC_NOTIFY) (QMGR_TRANSPORT *, VSTREAM *);
 extern QMGR_TRANSPORT *qmgr_transport_select(void);
 extern void qmgr_transport_alloc(QMGR_TRANSPORT *, QMGR_TRANSPORT_ALLOC_NOTIFY);
 extern void qmgr_transport_throttle(QMGR_TRANSPORT *, DSN *);
 extern void qmgr_transport_unthrottle(QMGR_TRANSPORT *);
+extern void qmgr_transport_suspend(QMGR_TRANSPORT *, int);
+extern void qmgr_transport_resume(int, void *);
 extern QMGR_TRANSPORT *qmgr_transport_create(const char *);
 extern QMGR_TRANSPORT *qmgr_transport_find(const char *);
 
 #define QMGR_TRANSPORT_THROTTLED(t)	((t)->flags & QMGR_TRANSPORT_STAT_DEAD)
+#define QMGR_TRANSPORT_SUSPENDED(t)	((t)->flags & QMGR_TRANSPORT_STAT_SUSPENDED)
 
  /*
   * Each next hop (e.g., a domain name) has its own queue of pending message

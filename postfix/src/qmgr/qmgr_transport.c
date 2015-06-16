@@ -221,6 +221,39 @@ void    qmgr_transport_throttle(QMGR_TRANSPORT *transport, DSN *dsn)
     }
 }
 
+/* qmgr_transport_suspend - suspends delivery */
+void qmgr_transport_suspend(QMGR_TRANSPORT *transport, int delay)
+{
+    const char *myname = "qmgr_transport_suspend";
+
+    /*
+     * Sanity checks.
+     */
+    if (QMGR_TRANSPORT_SUSPENDED(transport))
+	msg_panic("%s: bad transport status (suspended): %s", myname, transport->name);
+
+    transport->flags |= QMGR_TRANSPORT_STAT_SUSPENDED;
+
+msg_warn("Waiting %d seconds on transport %s", delay, transport->name);
+    event_request_timer(qmgr_transport_resume, (void *) transport, delay);
+}
+
+/* qmgr_transport_resume - resume delivery */
+void qmgr_transport_resume(int unused_event, void *context)
+{
+    QMGR_TRANSPORT *transport = (QMGR_TRANSPORT *) context;
+
+    const char *myname = "qmgr_transport_resume";
+
+    /*
+     * Sanity checks.
+     */
+    if (!QMGR_TRANSPORT_SUSPENDED(transport))
+	msg_panic("%s: bad transport status (not suspended): %s", myname, transport->name);
+
+    transport->flags &= ~QMGR_TRANSPORT_STAT_SUSPENDED;
+}
+
 /* qmgr_transport_abort - transport connect watchdog */
 
 static void qmgr_transport_abort(int unused_event, void *context)
@@ -286,7 +319,7 @@ QMGR_TRANSPORT *qmgr_transport_select(void)
 #define MIN5af51743e4eef(x, y) ((x) < (y) ? (x) : (y))
 
     for (xport = qmgr_transport_list.next; xport; xport = xport->peers.next) {
-	if ((xport->flags & QMGR_TRANSPORT_STAT_DEAD) != 0
+	if (xport->flags > 0
 	    || xport->pending >= QMGR_TRANSPORT_MAX_PEND)
 	    continue;
 	need = xport->pending + 1;
@@ -298,6 +331,10 @@ QMGR_TRANSPORT *qmgr_transport_select(void)
 		QMGR_LIST_ROTATE(qmgr_transport_list, xport, peers);
 		if (msg_verbose)
 		    msg_info("qmgr_transport_select: %s", xport->name);
+
+		if (xport->rate_delay > 0)
+		    qmgr_transport_suspend(xport, xport->rate_delay);
+
 		return (xport);
 	    }
 	}
@@ -314,8 +351,8 @@ void    qmgr_transport_alloc(QMGR_TRANSPORT *transport, QMGR_TRANSPORT_ALLOC_NOT
     /*
      * Sanity checks.
      */
-    if (transport->flags & QMGR_TRANSPORT_STAT_DEAD)
-	msg_panic("qmgr_transport: dead transport: %s", transport->name);
+    if (transport->flags > 0)
+	msg_panic("qmgr_transport: transport not ready: %s", transport->name);
     if (transport->pending >= QMGR_TRANSPORT_MAX_PEND)
 	msg_panic("qmgr_transport: excess allocation: %s", transport->name);
 
@@ -392,11 +429,16 @@ QMGR_TRANSPORT *qmgr_transport_create(const char *name)
     transport->init_dest_concurrency =
 	get_mail_conf_int2(name, _INIT_DEST_CON,
 			   var_init_dest_concurrency, 1, 0);
-    transport->rate_delay = get_mail_conf_time2(name, _DEST_RATE_DELAY,
+    transport->rate_delay = get_mail_conf_time2(name, _RATE_DELAY,
+						var_rate_delay,
+						's', 0, 0);
+    transport->dest_rate_delay = get_mail_conf_time2(name, _DEST_RATE_DELAY,
 						var_dest_rate_delay,
 						's', 0, 0);
 
-    if (transport->rate_delay > 0)
+    // FIXME: rate_delay will only work with 1 process.
+
+    if (transport->dest_rate_delay > 0)
 	transport->dest_concurrency_limit = 1;
     if (transport->dest_concurrency_limit != 0
     && transport->dest_concurrency_limit < transport->init_dest_concurrency)
