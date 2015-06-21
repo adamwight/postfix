@@ -64,6 +64,7 @@
 	0,
     };
     static const CONFIG_TIME_TABLE smtp_time_table[] = {
+	VAR_SMTP_MINIMUM_DELAY, DEF_SMTP_MINIMUM_DELAY, &var_smtp_minimum_delay, 0, 0,
 	VAR_SMTP_CONN_TMOUT, DEF_SMTP_CONN_TMOUT, &var_smtp_conn_tmout, 0, 0,
 	VAR_SMTP_HELO_TMOUT, DEF_SMTP_HELO_TMOUT, &var_smtp_helo_tmout, 1, 0,
 	VAR_SMTP_XFWD_TMOUT, DEF_SMTP_XFWD_TMOUT, &var_smtp_xfwd_tmout, 1, 0,

@@ -1025,6 +1025,10 @@ extern char *var_smtp_cache_dest;
 #endif
 extern bool var_smtp_cache_demand;
 
+#define VAR_SMTP_MINIMUM_DELAY	"smtp_minimum_delay"
+#define DEF_SMTP_MINIMUM_DELAY	"0s"
+extern int var_smtp_minimum_delay;
+
 #define VAR_SMTP_CONN_TMOUT	"smtp_connect_timeout"
 #define DEF_SMTP_CONN_TMOUT	"30s"
 extern int var_smtp_conn_tmout;
@@ -1812,6 +1816,10 @@ extern bool var_lmtp_cache_conn;
 #define VAR_LMTP_SKIP_QUIT_RESP	"lmtp_skip_quit_response"
 #define DEF_LMTP_SKIP_QUIT_RESP	0
 extern bool var_lmtp_skip_quit_resp;
+
+#define VAR_LMTP_MINIMUM_DELAY	"smtp_minimum_delay"
+#define DEF_LMTP_MINIMUM_DELAY	"0s"
+extern int var_lmtp_minimum_delay;
 
 #define VAR_LMTP_CONN_TMOUT	"lmtp_connect_timeout"
 #define DEF_LMTP_CONN_TMOUT	"0s"

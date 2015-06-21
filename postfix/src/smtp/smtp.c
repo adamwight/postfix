@@ -801,6 +801,7 @@
   * Tunable parameters. These have compiled-in defaults that can be overruled
   * by settings in the global Postfix configuration file.
   */
+int     var_smtp_minimum_delay;
 int     var_smtp_conn_tmout;
 int     var_smtp_helo_tmout;
 int     var_smtp_xfwd_tmout;
@@ -1021,6 +1022,11 @@ static void smtp_service(VSTREAM *client_stream, char *service, char **argv)
     if ((request = deliver_request_read(client_stream)) != 0) {
 	status = deliver_message(service, request);
 	deliver_request_done(client_stream, request, status);
+    }
+
+    if (var_smtp_minimum_delay > 0) {
+	msg_warn("Waiting %d seconds after smtp delivery", var_smtp_minimum_delay);
+	sleep(var_smtp_minimum_delay);
     }
 }
 
